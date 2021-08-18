@@ -12,16 +12,36 @@
 <body>
     <section class="views">
         <button id="listBtn">LIST ITEMS</button>
-        <button id="editBtn">EDIT ITEMS</button>
+        <!-- <button id="filterIdBtn">Filter by ID</button>
+        <button id="filterTitleBtn">Filter by Title</button> -->
         <button id="addBtn">ADD ITEMS</button>
+        
+        <form>
+            <p>Filter By:</p>
+            <input id="filterId" type="radio" name="filter" value="ID">
+            <label for="filterId">ID</label>
+            <input id="filterTitle" type="radio" name="filter" value="Title">
+            <label for="filterTitle">Title</label>
+            <input id="filterCompleted"type="radio" name="filter" value="Completed">
+            <label for="filterCompleted">Completed</label>
+            <input id="filterNotCompleted"type="radio" name="filter" value="Not Completed">
+            <label for="filterNotCompleted">Not Completed</label>
+        </form>
     </section>
 
     <section>
-        <ul id="list"></ul>
+        <div id="listDiv">
+            <ul id="list"></ul>
+        </div>
 
-        <form id="editItem">
+        <div id="editDiv">
+            <form id="editItem">
+            </form>
+        </div>
 
-        </form>
+        <div id="addDiv">
+            <form id="addItem"></form>
+        </div>
     </section>
     <script src="index.js"></script>
 </body>
