@@ -5,32 +5,34 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <!-- <link rel="stylesheet" href="main.css" /> -->
+    <link rel="stylesheet" href="index.css" />
     <title>List APP</title>
 </head>
 
 <body>
     <section class="views">
+        <h1>PURE JAVASCRIPT LIST APP</h1>
         <button id="listBtn">LIST ITEMS</button>
-        <!-- <button id="filterIdBtn">Filter by ID</button>
-        <button id="filterTitleBtn">Filter by Title</button> -->
         <button id="addBtn">ADD ITEMS</button>
-        
-        <form>
-            <p>Filter By:</p>
-            <input id="filterId" type="radio" name="filter" value="ID">
-            <label for="filterId">ID</label>
-            <input id="filterTitle" type="radio" name="filter" value="Title">
-            <label for="filterTitle">Title</label>
-            <input id="filterCompleted"type="radio" name="filter" value="Completed">
-            <label for="filterCompleted">Completed</label>
-            <input id="filterNotCompleted"type="radio" name="filter" value="Not Completed">
-            <label for="filterNotCompleted">Not Completed</label>
-        </form>
     </section>
-
+    
     <section>
         <div id="listDiv">
+            <form class="filterForm">
+                <p>Filter By:</p>
+                <input class="radio" id="filterIdAsc" type="radio" name="filter" value="IDAsc" checked="true">
+                <label for="filterIdAsc">ID Asc</label>
+                <input class="radio" id="filterIdDesc" type="radio" name="filter" value="IDDesc">
+                <label for="filterIdDesc">ID Desc</label>
+                <input class="radio" id="filterTitleAsc" type="radio" name="filter" value="TitleAsc">
+                <label for="filterTitleAsc">Title Asc</label>
+                <input class="radio" id="filterTitleDesc" type="radio" name="filter" value="TitleDesc">
+                <label for="filterTitleDesc">Title Desc</label>
+                <input class="radio" id="filterCompleted"type="radio" name="filter" value="Completed">
+                <label for="filterCompleted">Completed</label>
+                <input class="radio" id="filterNotCompleted"type="radio" name="filter" value="Not Completed">
+                <label for="filterNotCompleted">Not Completed</label>
+            </form>
             <ul id="list"></ul>
         </div>
 

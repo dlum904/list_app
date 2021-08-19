@@ -1,0 +1,42 @@
+body {
+    background-color: lightskyblue
+}
+.views {
+    text-align: center;
+}
+.filterForm{
+    margin: auto;
+    width: 33vw;
+}
+
+.item {
+    list-style: none;
+    width: 33vw;
+    margin: auto;
+    margin-top: 5px;
+    padding: 5px;
+    background-color: whitesmoke;
+    border-radius: 5px;
+}
+
+#editItem {
+    display: flex;
+    flex-direction: column;
+    width: 33vw;
+    margin: auto;
+    margin-top: 25vh;
+    padding: 5px;
+    background-color: whitesmoke;
+    border-radius: 5px;
+}
+
+#addItem {
+        display: flex;
+    flex-direction: column;
+    width: 33vw;
+    margin: auto;
+    margin-top: 25vh;
+    padding: 5px;
+    background-color: whitesmoke;
+    border-radius: 5px;
+}

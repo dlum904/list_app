@@ -12,4 +12,3 @@ users should be able to:
 - delete an item
 - edit an item
 - sort and filter a list of items a couple of differnet ways
-# list_app

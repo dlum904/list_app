@@ -1,18 +1,22 @@
-// import "../styles/index.css";
-
-// TODO: make everything compatable with nested data
 const apiUrl = "https://jsonplaceholder.typicode.com/users/1/todos";
 
 async function getApi(url) {
     const response = await fetch(url);
-    const data = await response.json();
-    console.log(data);
+    let data = await response.json();
+    // console.log(data);
 
     const listBtn = document.getElementById("listBtn");
     const addBtn = document.getElementById("addBtn");
     const listDiv = document.getElementById("listDiv");
     const editDiv = document.getElementById("editDiv");
     const addDiv = document.getElementById("addDiv");
+    const filterRadios = document.getElementsByName("filter");
+
+    // make copy of schema incase user deletes all data
+    let schema = data[0];
+
+    // add onclick to radio filters
+    for (let input of filterRadios) input.onclick = (e) => listView();
 
     listBtn.onclick = (e) => {
         e.preventDefault();
@@ -22,32 +26,28 @@ async function getApi(url) {
         e.preventDefault();
         addItem();
     }
-
     // LIST VIEW
 
     // when press list items, we run this function to display list
-    // TODO: sort by id/title/completed
     function listView() {
         listDiv.style.display = "block";
         editDiv.style.display = "none";
         addDiv.style.display = "none";
 
-        let ul = document.getElementById("list");
-        // console.log(ul)
+        filter();
 
         // clear out old list
         const oldItems = document.getElementsByClassName("item");
         while (oldItems.length) oldItems[0].remove();
-
+        
+        let ul = document.getElementById("list");
         // create our new list
         for (let i = 0; i < Object.keys(data).length; i++) {
             let item = data[i];
             const keys = Object.keys(item);
-            // console.log(keys)
             const li = document.createElement("li");
             li.setAttribute("class", "item");
             for (const key of keys) {
-                // console.log(key)
                 const div = document.createElement("div")
                 div.setAttribute("class", `${key}`)
                 div.appendChild(document.createTextNode(`${key}: ${item[key]}`))
@@ -78,12 +78,47 @@ async function getApi(url) {
         }
     }
 
-    // EDIT VIEW
+    // Filter/sort our data depending on our radio input filters
+    function filter() {
+        let filters = document.querySelector("form");
+        let filterBy
+        for (const filter of filters) {
+            if (filter.checked) filterBy = filter.value;
+        }
+        let filteredOut = data.filter((item) => item["completed"] === false);
+        let filteredIn = data.filter((item) => item["completed"] === true);
+        switch (filterBy) {
+            case "IDAsc":
+                data.sort((a, b) => a["id"] - b["id"]);
+                break;
+            case "IDDesc":
+                data.sort((a, b) => b["id"] - a["id"]);
+                break;
+            case "TitleAsc":
+                data.sort((a, b) => a["title"].charCodeAt(0) - b["title"][0].charCodeAt(0));
+                break;
+            case "TitleDesc":
+                data.sort((a, b) => b["title"].charCodeAt(0) - a["title"][0].charCodeAt(0));
+                break;
+            case "Completed":
+                data = filteredIn.concat(filteredOut);
+                break;
+            case "Not Completed":
+                data = filteredOut.concat(filteredIn);
+                break;
+
+        }
+
+    }
+
+    
+    // EDIT ITEM VIEW
     function editItem(idx) {
 
         let oldLabels = document.getElementsByClassName("formLabel");
         let oldInputs = document.getElementsByClassName("formInput");
 
+        // clear out old inputs
         while (oldLabels.length || oldInputs.length) {
             if (oldLabels.length) oldLabels[0].remove();
             if (oldInputs.length) oldInputs[0].remove();
@@ -93,24 +128,36 @@ async function getApi(url) {
         listDiv.style.display = "none";
         editDiv.style.display = "block";
         addDiv.style.display = "none";
-        // console.log(item)
+
         const form = document.getElementById("editItem");
         const keys = Object.keys(item);
         const newItem = {...item};
         for (const key of keys) {
-            // console.log(key)
             const label = document.createElement("label");
             label.appendChild(document.createTextNode(`${key}`));
             label.setAttribute("class", "formLabel")
             form.appendChild(label);
 
             const input = document.createElement("input");
-            input.setAttribute("type", "text");
-            input.setAttribute("value", `${item[key]}`);
-            input.setAttribute("class", "formInput")
-            input.onchange = () => {
-                newItem[key] = input.value;
+            if (typeof item[key] === "number") {
+                input.setAttribute("type", "number");
+                input.setAttribute("value", `${item[key]}`);
+                input.onchange = () => newItem[key] = input.value;
+            } else if (typeof item[key] === "boolean") {
+                input.setAttribute("type", "checkbox");
+                input.setAttribute("value", true);
+                if (item[key] === true) {
+                    input.setAttribute("checked", true);
+                }
+                input.onchange = () => {
+                    newItem[key] = !newItem[key];
+                }
+            } else {
+                input.setAttribute("type", "text")
+                input.onchange = () => newItem[key] = input.value;
             }
+            input.setAttribute("class", "formInput");
+            input.setAttribute("value", `${item[key]}`);
             form.appendChild(input);
         }
 
@@ -122,7 +169,11 @@ async function getApi(url) {
         form.appendChild(submit);
         submit.onclick = (e) => {
             e.preventDefault();
-            data[idx] = newItem;
+            validateDataType(newItem);
+            if (validateForm(newItem)) data[idx] = newItem;
+            else alert("please fill in ALL fields")
+            
+            listView();
         }
     }
 
@@ -132,36 +183,45 @@ async function getApi(url) {
         listView();
     }
 
-    // ADD ITEM
+    // ADD ITEM VIEW
     function addItem() {
         listDiv.style.display = "none";
         editDiv.style.display = "none"
         addDiv.style.display = "block";
+        
         let oldLabels = document.getElementsByClassName("formLabel");
         let oldInputs = document.getElementsByClassName("formInput");
-
+        // clear out old inputs
         while (oldLabels.length || oldInputs.length) {
             if (oldLabels.length) oldLabels[0].remove();
             if (oldInputs.length) oldInputs[0].remove();
         }
-        const keys = Object.keys(data[0]);
+        const keys = Object.keys(schema);
         let newItem ={};
         const form = document.getElementById("addItem");
-        // form.setAttribute("name", "addForm");
-
+        
         for (const key of keys) {
             const label = document.createElement("label");
             label.appendChild(document.createTextNode(`${key}`));
-            label.setAttribute("class", "formLabel")
+            label.setAttribute("class", "formLabel");
             form.appendChild(label);
 
             const input = document.createElement("input");
-            input.setAttribute("type", "text");
-            input.setAttribute("class", "formInput");
-            input.setAttribute("required", "");
-            input.onchange = () => {
-                newItem[key] = input.value;
+            if (typeof schema[key] === "number") {
+                input.setAttribute("type", "number");
+                input.onchange = () => newItem[key] = input.value;
+            } else if (typeof schema[key] === "boolean") {
+                input.setAttribute("type", "checkbox");
+                input.setAttribute("value", true);
+                input.onchange = () => {
+                    newItem[key] = !newItem[key];
+                }
+            } else {
+                input.setAttribute("type", "text")
+                input.onchange = () => newItem[key] = input.value;
             }
+            input.setAttribute("class", "formInput");
+
             form.appendChild(input);
         }
 
@@ -173,18 +233,29 @@ async function getApi(url) {
         form.appendChild(submit);
         submit.onclick = (e) => {
             e.preventDefault();
-            validateForm(form);
-            data.push(newItem);
+            validateDataType(newItem);
+            if (validateForm(newItem)) {
+                data.push(newItem);
+                listView();
+            }
+            else alert("please fill in ALL fields")
+            
         }
     }
+    // makes sure the data types or correct
+    function validateDataType(newItem) {
+        if (!newItem["completed"]) newItem["completed"] = false;
+        if (parseInt(newItem["userId"])) newItem["userId"] = parseInt(newItem["userId"])
+        if (parseInt(newItem["id"])) newItem["id"] = parseInt(newItem["id"]);
 
-    function validateForm(form) {
-        for (let i = 0; i < form.length - 1; i++) {
-            console.log(form[i])
-            console.log(form[i].value)
-        }
+    }
+    // makes sure all fields are filled
+    function validateForm(newItem) {
+        if (Object.keys(newItem).length < Object.keys(schema).length) return false;
+        return true;
     }
 
+    listView();
 }
 
 getApi(apiUrl);
